@@ -1,0 +1,867 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STINKY SPIES</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    background: #050708;
+    color: #eafff3;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ---------- LOGIN ---------- */
+
+#loginPage {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(circle at center, #10251d 0%, #050708 55%);
+}
+
+.loginBox {
+    width: 420px;
+    max-width: 90%;
+    padding: 40px;
+    background: rgba(10,15,16,.94);
+    border: 1px solid #1d4937;
+    border-radius: 20px;
+    box-shadow: 0 0 60px rgba(0,255,140,.08);
+    text-align: center;
+}
+
+.logo {
+    color: #55ff9a;
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 6px;
+}
+
+.subtitle {
+    margin-top: 8px;
+    margin-bottom: 35px;
+    color: #60736d;
+    font-size: 11px;
+    letter-spacing: 3px;
+}
+
+.loginBox input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #263a34;
+    background: #070b0c;
+    color: white;
+    outline: none;
+    font-size: 15px;
+}
+
+.loginBox input:focus {
+    border-color: #55ff9a;
+}
+
+.enterBtn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #55ff9a;
+    color: #041008;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.error {
+    margin-top: 12px;
+    color: #ff6868;
+    font-size: 12px;
+}
+
+/* ---------- MAIN APP ---------- */
+
+#app {
+    display: none;
+    height: 100vh;
+    grid-template-columns: 280px 1fr;
+}
+
+/* ---------- SIDEBAR ---------- */
+
+.sidebar {
+    background: #080c0e;
+    border-right: 1px solid #172327;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebarHeader {
+    padding: 22px;
+    border-bottom: 1px solid #172327;
+}
+
+.sidebarLogo {
+    color: #55ff9a;
+    font-weight: 900;
+    letter-spacing: 3px;
+}
+
+.classified {
+    margin-top: 5px;
+    color: #586a6d;
+    font-size: 9px;
+    letter-spacing: 2px;
+}
+
+.profileCard {
+    margin: 18px;
+    padding: 16px;
+    border-radius: 14px;
+    background: #0d1517;
+    border: 1px solid #1c322b;
+}
+
+.profileCard small {
+    color: #60736d;
+    font-size: 9px;
+    letter-spacing: 2px;
+}
+
+.codename {
+    margin-top: 6px;
+    color: #55ff9a;
+    font-weight: bold;
+}
+
+.memberTitle {
+    padding: 0 18px;
+    margin-top: 5px;
+    color: #526568;
+    font-size: 9px;
+    letter-spacing: 2px;
+}
+
+.members {
+    padding: 10px 18px;
+    overflow-y: auto;
+}
+
+.member {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 4px;
+    border-bottom: 1px solid #10191c;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #13271f;
+    color: #55ff9a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.memberName {
+    font-size: 13px;
+}
+
+/* ---------- CHAT ---------- */
+
+.chat {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.chatHeader {
+    height: 72px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #172327;
+    background: #080c0e;
+}
+
+.groupName {
+    font-weight: bold;
+}
+
+.groupStatus {
+    color: #55ff9a;
+    font-size: 9px;
+    margin-top: 4px;
+    letter-spacing: 1px;
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.empty {
+    margin: auto;
+    text-align: center;
+    color: #4f6165;
+    font-size: 13px;
+}
+
+.message {
+    max-width: 70%;
+    align-self: flex-start;
+    padding: 9px 12px;
+    border-radius: 5px 15px 15px 15px;
+    background: #11191c;
+    border: 1px solid #1b292d;
+}
+
+.message.mine {
+    align-self: flex-end;
+    background: #12352a;
+    border-color: #1e6049;
+    border-radius: 15px 5px 15px 15px;
+}
+
+.sender {
+    color: #16d9ff;
+    font-size: 10px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.mine .sender {
+    color: #55ff9a;
+}
+
+.messageText {
+    font-size: 14px;
+    word-break: break-word;
+}
+
+.time {
+    margin-top: 5px;
+    text-align: right;
+    color: #627276;
+    font-size: 9px;
+}
+
+/* ---------- MESSAGE BAR ---------- */
+
+.messageBar {
+    display: flex;
+    gap: 10px;
+    padding: 14px;
+    border-top: 1px solid #172327;
+    background: #080c0e;
+}
+
+.messageBar input {
+    flex: 1;
+    padding: 13px 17px;
+    border-radius: 22px;
+    border: 1px solid #26373b;
+    background: #070a0c;
+    color: white;
+    outline: none;
+}
+
+.messageBar input:focus {
+    border-color: #55ff9a;
+}
+
+.sendBtn {
+    padding: 0 22px;
+    border: none;
+    border-radius: 22px;
+    background: #55ff9a;
+    color: #041008;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ---------- MOBILE ---------- */
+
+@media(max-width:700px) {
+
+    #app {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        display: none;
+    }
+
+    .messages {
+        padding: 15px;
+    }
+
+    .message {
+        max-width: 85%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= LOGIN ================= -->
+
+<section id="loginPage">
+
+    <div class="loginBox">
+
+        <div class="logo">STINKY SPIES</div>
+
+        <div class="subtitle">
+            CLASSIFIED GROUP NETWORK
+        </div>
+
+        <input
+            id="nameInput"
+            type="text"
+            placeholder="Enter your name..."
+            autocomplete="off"
+        >
+
+        <button class="enterBtn" onclick="joinNetwork()">
+            ENTER DATABASE →
+        </button>
+
+        <div id="errorMessage" class="error"></div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= APP ================= -->
+
+<section id="app">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebarHeader">
+
+            <div class="sidebarLogo">
+                STINKY SPIES
+            </div>
+
+            <div class="classified">
+                SECURE GROUP CHANNEL
+            </div>
+
+        </div>
+
+
+        <div class="profileCard">
+
+            <small>
+                YOUR CODENAME
+            </small>
+
+            <div
+                class="codename"
+                id="myCodename"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="memberTitle">
+            ACTIVE SPIES
+        </div>
+
+        <div
+            class="members"
+            id="membersList"
+        ></div>
+
+    </aside>
+
+
+    <!-- CHAT -->
+
+    <main class="chat">
+
+        <header class="chatHeader">
+
+            <div>
+
+                <div class="groupName">
+                    STINKY SPIES GC
+                </div>
+
+                <div
+                    class="groupStatus"
+                    id="groupStatus"
+                >
+                    0 SPIES
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <div
+            class="messages"
+            id="messages"
+        >
+
+            <div class="empty">
+                No classified messages yet.<br>
+                Start the conversation.
+            </div>
+
+        </div>
+
+
+        <form
+            class="messageBar"
+            onsubmit="sendMessage(event)"
+        >
+
+            <input
+                id="messageInput"
+                type="text"
+                placeholder="Type a message..."
+                autocomplete="off"
+            >
+
+            <button
+                class="sendBtn"
+                type="submit"
+            >
+                SEND
+            </button>
+
+        </form>
+
+    </main>
+
+</section>
+
+
+<script>
+
+/* ==========================================
+   FRONTEND DATA
+   Replace these later with your backend.
+========================================== */
+
+let currentUser = null;
+
+let users = [];
+
+let messages = [];
+
+
+/* ==========================================
+   CODENAME GENERATOR
+========================================== */
+
+const codeWords = [
+    "GHOST",
+    "RAVEN",
+    "NOVA",
+    "ECHO",
+    "ONYX",
+    "VORTEX",
+    "PHANTOM",
+    "CIPHER",
+    "FROST",
+    "SHADOW",
+    "COMET",
+    "BYTE"
+];
+
+
+function generateCodename(name) {
+
+    let total = 0;
+
+    for (let i = 0; i < name.length; i++) {
+        total += name.charCodeAt(i) * (i + 1);
+    }
+
+    const word =
+        codeWords[total % codeWords.length];
+
+    const number =
+        (total % 90) + 10;
+
+    return word + "-" + number;
+}
+
+
+/* ==========================================
+   JOIN
+========================================== */
+
+function joinNetwork() {
+
+    const input =
+        document.getElementById("nameInput");
+
+    const error =
+        document.getElementById("errorMessage");
+
+    const name =
+        input.value.trim();
+
+    if (!name) {
+
+        error.textContent =
+            "ENTER YOUR NAME TO CONTINUE.";
+
+        return;
+    }
+
+    error.textContent = "";
+
+
+    /*
+       If the same person enters again,
+       keep their existing codename.
+    */
+
+    let existingUser =
+        users.find(
+            user =>
+            user.name.toLowerCase()
+            === name.toLowerCase()
+        );
+
+
+    if (existingUser) {
+
+        currentUser = existingUser;
+
+    } else {
+
+        currentUser = {
+
+            name: name,
+
+            codename:
+                generateCodename(name)
+
+        };
+
+        users.push(currentUser);
+
+    }
+
+
+    showApp();
+
+}
+
+
+/* ==========================================
+   OPEN APP
+========================================== */
+
+function showApp() {
+
+    document.getElementById("loginPage")
+        .style.display = "none";
+
+    document.getElementById("app")
+        .style.display = "grid";
+
+
+    document.getElementById("myCodename")
+        .textContent =
+        currentUser.codename;
+
+
+    renderMembers();
+
+    renderMessages();
+
+}
+
+
+/* ==========================================
+   MEMBERS
+========================================== */
+
+function renderMembers() {
+
+    const container =
+        document.getElementById("membersList");
+
+    const status =
+        document.getElementById("groupStatus");
+
+
+    status.textContent =
+        users.length +
+        (users.length === 1
+            ? " SPY"
+            : " SPIES");
+
+
+    container.innerHTML = "";
+
+
+    users.forEach(user => {
+
+        const member =
+            document.createElement("div");
+
+        member.className = "member";
+
+
+        const avatar =
+            document.createElement("div");
+
+        avatar.className = "avatar";
+
+        avatar.textContent =
+            user.codename.charAt(0);
+
+
+        const name =
+            document.createElement("div");
+
+        name.className =
+            "memberName";
+
+        name.textContent =
+            user.codename;
+
+
+        member.appendChild(avatar);
+
+        member.appendChild(name);
+
+        container.appendChild(member);
+
+    });
+
+}
+
+
+/* ==========================================
+   SEND MESSAGE
+========================================== */
+
+function sendMessage(event) {
+
+    event.preventDefault();
+
+
+    const input =
+        document.getElementById("messageInput");
+
+
+    const text =
+        input.value.trim();
+
+
+    if (!text) {
+        return;
+    }
+
+
+    /*
+       FRONTEND ONLY
+
+       Later replace this section with:
+
+       fetch("/api/messages", {
+           method: "POST",
+           ...
+       })
+
+       or Firebase / Supabase / your backend.
+    */
+
+
+    const newMessage = {
+
+        sender:
+            currentUser.codename,
+
+        text: text,
+
+        time:
+            new Date()
+
+    };
+
+
+    messages.push(newMessage);
+
+
+    input.value = "";
+
+
+    renderMessages();
+
+}
+
+
+/* ==========================================
+   DISPLAY MESSAGES
+========================================== */
+
+function renderMessages() {
+
+    const container =
+        document.getElementById("messages");
+
+
+    if (messages.length === 0) {
+
+        container.innerHTML = `
+            <div class="empty">
+                No classified messages yet.<br>
+                Start the conversation.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    messages.forEach(message => {
+
+        const bubble =
+            document.createElement("div");
+
+
+        if (
+            message.sender
+            === currentUser.codename
+        ) {
+
+            bubble.className =
+                "message mine";
+
+        } else {
+
+            bubble.className =
+                "message";
+
+        }
+
+
+        const sender =
+            document.createElement("div");
+
+        sender.className =
+            "sender";
+
+        sender.textContent =
+            message.sender;
+
+
+        const text =
+            document.createElement("div");
+
+        text.className =
+            "messageText";
+
+        text.textContent =
+            message.text;
+
+
+        const time =
+            document.createElement("div");
+
+        time.className =
+            "time";
+
+        time.textContent =
+            formatTime(message.time);
+
+
+        bubble.appendChild(sender);
+
+        bubble.appendChild(text);
+
+        bubble.appendChild(time);
+
+
+        container.appendChild(bubble);
+
+    });
+
+
+    container.scrollTop =
+        container.scrollHeight;
+
+}
+
+
+/* ==========================================
+   TIME
+========================================== */
+
+function formatTime(date) {
+
+    return new Date(date)
+        .toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+
+}
+
+
+/* ==========================================
+   ENTER KEY
+========================================== */
+
+document
+    .getElementById("nameInput")
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                joinNetwork();
+
+            }
+
+        }
+    );
+
+</script>
+
+</body>
+</html>
+```
