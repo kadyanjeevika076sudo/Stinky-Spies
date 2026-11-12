@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STINKY SPIES</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #050607;
+      color: #d8ffe9;
+      font-family: "Courier New", monospace;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .screen {
+      display: none;
+      height: 100vh;
+      width: 100%;
+    }
+
+    .active {
+      display: flex;
+    }
+
+    /* LOGIN */
+
+    #loginScreen {
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background:
+        radial-gradient(circle at center, #10251b 0%, #050607 55%);
+    }
+
+    .logo {
+      font-size: clamp(38px, 8vw, 75px);
+      letter-spacing: 8px;
+      color: #7dffae;
+      text-shadow: 0 0 15px #20ff72;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .classified {
+      color: #65756b;
+      letter-spacing: 5px;
+      font-size: 12px;
+      margin-bottom: 45px;
+    }
+
+    .login-box {
+      width: min(90%, 420px);
+      border: 1px solid #244b35;
+      padding: 30px;
+      background: rgba(7, 14, 10, 0.92);
+      box-shadow: 0 0 30px rgba(0,255,100,.08);
+    }
+
+    .login-box label {
+      display: block;
+      color: #7dffae;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 14px;
+      background: #020403;
+      border: 1px solid #31543e;
+      color: white;
+      outline: none;
+      font-family: inherit;
+      margin-bottom: 18px;
+    }
+
+    .login-box input:focus {
+      border-color: #64ff9a;
+      box-shadow: 0 0 10px rgba(70,255,130,.15);
+    }
+
+    button {
+      border: 1px solid #4dff8b;
+      background: #0a2114;
+      color: #7dffae;
+      padding: 12px 18px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #123b21;
+      box-shadow: 0 0 15px rgba(80,255,140,.2);
+    }
+
+    #status {
+      margin-top: 15px;
+      font-size: 12px;
+      color: #ff7373;
+    }
+
+    /* MAIN */
+
+    #mainScreen {
+      flex-direction: column;
+    }
+
+    header {
+      height: 70px;
+      border-bottom: 1px solid #1d3827;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      background: #070b08;
+    }
+
+    .header-title {
+      color: #7dffae;
+      letter-spacing: 3px;
+      font-size: 20px;
+    }
+
+    .my-code {
+      font-size: 12px;
+      color: #87968d;
+    }
+
+    .layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 0;
+    }
+
+    /* MEMBERS */
+
+    .members {
+      border-right: 1px solid #1d3827;
+      background: #080c09;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .members h3 {
+      color: #6cff9f;
+      font-size: 13px;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+
+    .member {
+      padding: 12px;
+      border: 1px solid #17291d;
+      margin-bottom: 8px;
+      background: #0a100c;
+      font-size: 13px;
+    }
+
+    .online {
+      color: #65ff96;
+      margin-right: 6px;
+    }
+
+    /* CHAT */
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background:
+        radial-gradient(circle at center, rgba(20,50,30,.15), transparent 60%);
+    }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 25px;
+    }
+
+    .message {
+      margin-bottom: 18px;
+      max-width: 75%;
+    }
+
+    .message.mine {
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .sender {
+      font-size: 11px;
+      color: #65ff96;
+      margin-bottom: 4px;
+    }
+
+    .bubble {
+      display: inline-block;
+      background: #0d1710;
+      border: 1px solid #203b29;
+      padding: 10px 13px;
+      color: #dfffe9;
+      word-break: break-word;
+    }
+
+    .mine .bubble {
+      background: #12351f;
+      border-color: #2d6c42;
+    }
+
+    .time {
+      font-size: 9px;
+      color: #59645d;
+      margin-top: 4px;
+    }
+
+    .input-area {
+      border-top: 1px solid #1d3827;
+      padding: 15px;
+      display: flex;
+      gap: 10px;
+      background: #070b08;
+    }
+
+    #messageInput {
+      flex: 1;
+      padding: 13px;
+      background: #020403;
+      border: 1px solid #294633;
+      color: white;
+      font-family: inherit;
+      outline: none;
+    }
+
+    #sendBtn {
+      min-width: 90px;
+    }
+
+    @media (max-width: 700px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .members {
+        display: none;
+      }
+
+      header {
+        padding: 0 15px;
+      }
+
+      .message {
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN -->
+  <section id="loginScreen" class="screen active">
+
+    <div class="logo">STINKY SPIES</div>
+
+    <div class="classified">
+      CLASSIFIED // SPY NETWORK
+    </div>
+
+    <div class="login-box">
+      <label>ENTER YOUR NAME</label>
+
+      <input
+        id="nameInput"
+        type="text"
+        maxlength="30"
+        placeholder="Your name..."
+        autocomplete="off"
+      >
+
+      <button id="joinBtn">ENTER DATABASE →</button>
+
+      <div id="status"></div>
+    </div>
+
+  </section>
+
+
+  <!-- MAIN -->
+  <section id="mainScreen" class="screen">
+
+    <header>
+      <div class="header-title">
+        STINKY SPIES // SECURE CHAT
+      </div>
+
+      <div class="my-code">
+        CODENAME: <span id="myCodename">---</span>
+      </div>
+    </header>
+
+    <div class="layout">
+
+      <!-- MEMBERS -->
+      <aside class="members">
+
+        <h3>ACTIVE SPIES</h3>
+
+        <div id="membersList"></div>
+
+      </aside>
+
+
+      <!-- CHAT -->
+      <main class="chat">
+
+        <div id="messages"></div>
+
+        <div class="input-area">
+
+          <input
+            id="messageInput"
+            type="text"
+            maxlength="500"
+            placeholder="Transmit classified message..."
+            autocomplete="off"
+          >
+
+          <button id="sendBtn">SEND</button>
+
+        </div>
+
+      </main>
+
+    </div>
+
+  </section>
+
+
+<script>
+
+  /* =========================
+     FIREBASE CONFIG
+  ========================= */
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDp-8ASpBbkPvNy0vZvory1H65cHy6pgvs",
+    authDomain: "stinky-spies.firebaseapp.com",
+    databaseURL: "https://stinky-spies-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "stinky-spies",
+    storageBucket: "stinky-spies.firebasestorage.app",
+    messagingSenderId: "652785404780",
+    appId: "1:652785404780:web:ef4f306ec50953304a4149",
+    measurementId: "G-PW0BTS6MVY"
+  };
+
+
+  firebase.initializeApp(firebaseConfig);
+
+  const auth = firebase.auth();
+  const db = firebase.database();
+
+
+  /* =========================
+     ELEMENTS
+  ========================= */
+
+  const loginScreen = document.getElementById("loginScreen");
+  const mainScreen = document.getElementById("mainScreen");
+
+  const nameInput = document.getElementById("nameInput");
+  const joinBtn = document.getElementById("joinBtn");
+
+  const status = document.getElementById("status");
+
+  const myCodename = document.getElementById("myCodename");
+
+  const membersList = document.getElementById("membersList");
+
+  const messages = document.getElementById("messages");
+
+  const messageInput = document.getElementById("messageInput");
+  const sendBtn = document.getElementById("sendBtn");
+
+
+  /* =========================
+     SPY CODENAME GENERATOR
+  ========================= */
+
+  const spyNames = [
+    "GHOST",
+    "RAVEN",
+    "NOVA",
+    "ECHO",
+    "ONYX",
+    "VORTEX",
+    "PHANTOM",
+    "CIPHER",
+    "FROST",
+    "SHADOW",
+    "COMET",
+    "BYTE",
+    "NIGHTFALL",
+    "ZERO",
+    "SPECTRE",
+    "ORBIT"
+  ];
+
+
+  function generateCodename(name) {
+
+    let total = 0;
+
+    for (let i = 0; i < name.length; i++) {
+      total += name.charCodeAt(i);
+    }
+
+    const spy = spyNames[total % spyNames.length];
+
+    const number = (total % 90) + 10;
+
+    return spy + "-" + number;
+  }
+
+
+  /* =========================
+     JOIN DATABASE
+  ========================= */
+
+  joinBtn.addEventListener("click", joinDatabase);
+
+  nameInput.addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+      joinDatabase();
+    }
+
+  });
+
+
+  async function joinDatabase() {
+
+    const realName = nameInput.value.trim();
+
+    if (!realName) {
+      status.textContent = "ERROR: NAME REQUIRED.";
+      return;
+    }
+
+    if (realName.length < 2) {
+      status.textContent = "ERROR: INVALID IDENTIFICATION.";
+      return;
+    }
+
+    joinBtn.disabled = true;
+    status.style.color = "#7dffae";
+    status.textContent = "AUTHENTICATING SPY...";
+
+    try {
+
+      const userCredential =
+        await auth.signInAnonymously();
+
+      const user = userCredential.user;
+
+      const codename = generateCodename(realName);
+
+      myCodename.textContent = codename;
+
+      /*
+        We store ONLY the codename.
+        Real name is NOT sent to Firebase.
+      */
+
+      await db.ref("users/" + user.uid).set({
+        codename: codename,
+        joinedAt: firebase.database.ServerValue.TIMESTAMP
+      });
+
+      loginScreen.classList.remove("active");
+      mainScreen.classList.add("active");
+
+      startDatabaseListeners();
+
+    } catch (error) {
+
+      console.error(error);
+
+      status.style.color = "#ff7373";
+
+      status.textContent =
+        "DATABASE ERROR: " + error.message;
+
+      joinBtn.disabled = false;
+    }
+  }
+
+
+  /* =========================
+     REALTIME LISTENERS
+  ========================= */
+
+  function startDatabaseListeners() {
+
+    /* MEMBERS */
+
+    db.ref("users").on("value", function(snapshot) {
+
+      membersList.innerHTML = "";
+
+      snapshot.forEach(function(child) {
+
+        const data = child.val();
+
+        if (!data || !data.codename) return;
+
+        const member = document.createElement("div");
+
+        member.className = "member";
+
+        member.innerHTML =
+          '<span class="online">●</span>' +
+          escapeHTML(data.codename);
+
+        membersList.appendChild(member);
+
+      });
+
+    });
+
+
+    /* MESSAGES */
+
+    db.ref("messages")
+      .limitToLast(100)
+      .on("value", function(snapshot) {
+
+        messages.innerHTML = "";
+
+        snapshot.forEach(function(child) {
+
+          const data = child.val();
+
+          if (!data) return;
+
+          renderMessage(data);
+
+        });
+
+        messages.scrollTop = messages.scrollHeight;
+
+      });
+
+  }
+
+
+  /* =========================
+     RENDER MESSAGE
+  ========================= */
+
+  function renderMessage(data) {
+
+    const wrapper = document.createElement("div");
+
+    const isMine =
+      auth.currentUser &&
+      data.uid === auth.currentUser.uid;
+
+    wrapper.className =
+      "message" + (isMine ? " mine" : "");
+
+    const sender =
+      document.createElement("div");
+
+    sender.className = "sender";
+
+    sender.textContent =
+      data.sender || "UNKNOWN SPY";
+
+    const bubble =
+      document.createElement("div");
+
+    bubble.className = "bubble";
+
+    bubble.textContent =
+      data.text || "";
+
+    const time =
+      document.createElement("div");
+
+    time.className = "time";
+
+    time.textContent =
+      formatTime(data.time);
+
+    wrapper.appendChild(sender);
+    wrapper.appendChild(bubble);
+    wrapper.appendChild(time);
+
+    messages.appendChild(wrapper);
+  }
+
+
+  /* =========================
+     SEND MESSAGE
+  ========================= */
+
+  sendBtn.addEventListener("click", sendMessage);
+
+  messageInput.addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+
+  });
+
+
+  async function sendMessage() {
+
+    const text =
+      messageInput.value.trim();
+
+    if (!text) return;
+
+    if (!auth.currentUser) {
+      alert("You are not authenticated.");
+      return;
+    }
+
+    const codename =
+      myCodename.textContent;
+
+    try {
+
+      await db.ref("messages").push({
+
+        uid: auth.currentUser.uid,
+
+        sender: codename,
+
+        text: text,
+
+        time:
+          firebase.database.ServerValue.TIMESTAMP
+
+      });
+
+      messageInput.value = "";
+
+      messageInput.focus();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert("MESSAGE TRANSMISSION FAILED.");
+
+    }
+
+  }
+
+
+  /* =========================
+     TIME FORMAT
+  ========================= */
+
+  function formatTime(timestamp) {
+
+    if (!timestamp) return "--:--";
+
+    const date =
+      new Date(timestamp);
+
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+  }
+
+
+  /* =========================
+     SECURITY
+     Prevent HTML injection
+  ========================= */
+
+  function escapeHTML(text) {
+
+    const div =
+      document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+
+  }
+
+</script>
+
+</body>
+</html>
